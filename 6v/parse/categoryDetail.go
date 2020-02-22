@@ -17,9 +17,16 @@ func CategoryDetail(content []byte) engine.ParseResult  {
 	var items []interface{}
 
 	for _, v := range result {
+		fileName := string(v[2])
 		request := engine.Request{
 			Url:        string(v[1]),
-			ParserFunc: FilmDetail,
+			//ParserFunc: FilmDetail,
+			//ParserFunc: func(c []byte) engine.ParseResult {
+			//	return FilmDetail(c, string(v[1]))
+			//},
+			ParserFunc: func(bytes []byte) engine.ParseResult {
+				return FilmDetailByDuc(bytes, fileName)
+			},
 		}
 		item := engine.Item{
 			Url: string(v[1]),

@@ -3,14 +3,22 @@ package main
 import (
 	"filmspider/6v/parse"
 	"filmspider/engine"
+	"filmspider/schedules"
 )
 
 func main()  {
 
-	engine.Run(engine.Request{
+	//eg := engine.SimpleEngine{}
+	eg := engine.CronEngine{
+		Scheduler: &schedules.SimpleSchedule{},
+		WorkerChannelCount: 10,
+	}
+	eg.Run(engine.Request{
 		Url: "https://www.i6v.cc",
-		//Url: "https://www.i6v.cc/xijupian/12510.html",
-		//ParserFunc: parse.FilmDetail,
+		//Url: "https://www.i6v.cc/juqingpian/12772.html",
+		//ParserFunc: func(bytes []byte) engine.ParseResult {
+		//	return parse.FilmDetailByDuc(bytes, "2323")
+		//},
 		ParserFunc: parse.CategoryParse,
 	})
 }

@@ -14,7 +14,7 @@ type Film struct {
 type Introduce struct {
 	Director string
 	Writer string
-	Actors []Actor
+	Actors []string
 	Plot string
 }
 
