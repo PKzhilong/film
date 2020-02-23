@@ -3,21 +3,18 @@ package model
 type Film struct {
 	Name string
 	Cover string
-	InfoImage string
-	Introduce Introduce
 	Type int
 	Language string
 	ShowTime string
 	Length int
-}
+	Area string
+	TypeName string
 
-type Introduce struct {
+
 	Director string
 	Writer string
-	Actors []string
-	Plot string
-}
+	Actors string
 
-type Actor struct {
-	Name string
+	Plot string
+	Content string
 }

@@ -7,18 +7,22 @@ type CronEngine struct {
 
 type Scheduler interface {
 	Submit(request Request)
-	ConfWorkChannel(chan Request)
+	WorkerChannel() chan Request
+	Run()
+	NotifyWorkChannel
+}
+
+type NotifyWorkChannel interface {
+	WorkReady(chan Request)
 }
 
 func (c *CronEngine) Run(seed ...Request)  {
 
-	in := make(chan Request)
 	out := make(chan ParseResult)
-
-	c.Scheduler.ConfWorkChannel(in)
+	c.Scheduler.Run()
 
 	for i := 0; i < c.WorkerChannelCount; i++ {
-		createWorker(in, out)
+		createWorker(c.Scheduler.WorkerChannel(), out, c.Scheduler)
 	}
 
 	//通过调度器收request
@@ -40,9 +44,10 @@ func (c *CronEngine) Run(seed ...Request)  {
 	}
 }
 
-func createWorker(in chan Request, out chan ParseResult)  {
+func createWorker(in chan Request, out chan ParseResult, n NotifyWorkChannel)  {
 	go func() {
 		for {
+			n.WorkReady(in)
 			request := <- in
 			result, err := Worker(request)
 			if err != nil {

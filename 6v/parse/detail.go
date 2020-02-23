@@ -4,123 +4,93 @@ import (
 	"bytes"
 	"filmspider/engine"
 	"filmspider/model"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"log"
 	"regexp"
-	"strings"
 )
 
-var film = map[int]string{
-	1: "导演",
-	2: "编剧",
-	3: "主演",
-	4: "类型",
-	5: "地区",
-	6: "语言",
-	7: "字幕",
-	8: "上映日期",
-	9: "剧情介绍",
-}
-
 var coverDetail = regexp.MustCompile(`<p>[^<]*<img alt[=|"]* src="([^"]+)"[^>]*>`)
-var filmInfo = regexp.MustCompile(`导演:(.+)?编剧:(.+)?主演:(.+)?类型:(.+)?地区:(.+)?语言:(.+)?字幕:(.+)?上映日期:(.+)?剧情简介(.+)`)
+
+//导演
+var dirtor = regexp.MustCompile(`导　　演[\s|:]*?([^<]+?)<br/>`)
+var dirtor2 = regexp.MustCompile(`导演[\s|:]*?([^<]+?)<br/>`)
+
+//编剧
+var writer = regexp.MustCompile(`编　　剧[\s|:]*?([^<]+?)<br/>`)
+var writer2 = regexp.MustCompile(`编剧[\s|:]*?([^<]+?)<br/>`)
+
+//主演
+var actor = regexp.MustCompile(`主　　演[\s|:]*?([^<]+?)<br/>`)
+var actor2 = regexp.MustCompile(`主演[\s|:]*?([^<]+?)<br/>`)
+//类型
+var filmType = regexp.MustCompile(`类　　别[\s|:]*?([^<]+?)<br/>`)
+var filmType2 = regexp.MustCompile(`类型[\s|:]*?([^<]+?)<br/>`)
+
+//地区
+var area = regexp.MustCompile(`国　　家[\s|:]*?([^<]+?)<br/>`)
+var area3 = regexp.MustCompile(`产　　地[\s|:]*?([^<]+?)<br/>`)
+var area2 = regexp.MustCompile(`地区[\s|:]*?([^<]+?)<br/>`)
+
+//字幕
+var font = regexp.MustCompile(`字　　幕[\s|:]*?([^<]+?)<br/>`)
+var font2 = regexp.MustCompile(`字幕[\s|:]*?([^<]+?)<br/>`)
+
+//上映时间
+var onTime = regexp.MustCompile(`年　　代[\s|:]*?([^<]+?)<br/>`)
+var onTime2 = regexp.MustCompile(`上映日期[\s|:]*?([^<]+?)<br/>`)
+
+//下载地址
+//var downloadUrl =
 
 var coverImg = "#post_content>p>img"
-var info = "#post_content>p"
+var info = "#post_content"
+var downloadTable = "table>tbody tr"
 
-func FilmDetail(content []byte, fatherUrl string) engine.ParseResult{
-	result := coverDetail.FindAllSubmatch(content, -1)
-
-	var parse engine.ParseResult
-	var requests []engine.Request
-	var items []interface{}
-	coverImg := ""
-	infoImg := ""
-	for k, v := range result {
-		if k == 1 {
-			infoImg = string(v[1])
-			continue
-		}
-
-		coverImg = string(v[1])
-		request := engine.Request{
-			Url: string(v[1]),
-			ParserFunc: engine.NilParaser,
-		}
-		requests = append(requests, request)
-	}
-	log.Printf("封面图：%s 详情图：%s", coverImg, infoImg)
-	if len(infoImg) < 1 {
-		log.Printf("详情图未找到： %s", fatherUrl)
-	}
-	parse.Requests = requests
-	parse.Items = items
-	return engine.ParseResult{}
-}
-
-func FilmDetailByDuc(content []byte, title string) engine.ParseResult{
+func FilmDetailByDuc(content []byte, title string) engine.ParseResult {
 
 	cont := bytes.NewReader(content)
 	doc, _ := goquery.NewDocumentFromReader(cont)
 
 	var parse engine.ParseResult
-	//var requests []engine.Request
-	//var items []interface{}
 
 	item := model.Film{
 		Name: title,
 		Type: 3,
-		Introduce: model.Introduce{},
 	}
 
 	doc.Find(coverImg).Each(func(i int, selection *goquery.Selection) {
 		url, _ := selection.Attr("src")
 		if i == 0 {
 			item.Cover = url
-		} else {
-			item.InfoImage = url
 		}
 	})
 
-	inf := doc.Find(info).Text()
-	result := filmInfo.FindAllSubmatch([]byte(inf), -1)
+	inf, _ := doc.Find(info).Html()
+	conBytes := []byte(inf)
+	item.Director = getContent(conBytes, dirtor, dirtor2)
 
-	for _, v := range result {
-		for i := 0; i < len(v); i++ {
-			if i == 0 {
-				continue
-			}
+	item.Writer = getContent(conBytes, writer, writer2)
+	item.Actors = getContent(conBytes, actor2, actor)
+	item.Language = getContent(conBytes,font2, font)
+	item.ShowTime = getContent(conBytes, onTime, onTime2)
+	item.Area = getContent(conBytes, area, area2)
+	item.TypeName = getContent(conBytes, filmType, filmType2)
 
-			_, err := film[i]
-			if !err {
-				continue
-			}
+	//fmt.Printf("%v \n", item)
+	doc.Find(downloadTable).Each(func(i int, selection *goquery.Selection) {
+		c := selection.Text()
+		fmt.Printf("%s\n", c)
+	})
+	return parse
+}
 
-			con := string(v[i])
-			switch i {
-			case 1:
-				item.Introduce.Director = con
-				break
-			case 2:
-				item.Introduce.Writer = con
-				break
-			case 3:
-				actors := strings.Split(con, " / ")
-				item.Introduce.Actors = actors
-				break
-			case 4:
-				break
-			case 5:
-				break
-			case 6:
-				break
-			case 9:
-				item.Introduce.Plot = con
-				break
-			}
+func getContent(cont []byte, regs ...*regexp.Regexp) string {
+	content := ""
+	for _, reg := range regs {
+		result := reg.FindAllSubmatch(cont, -1)
+		if len(result) > 0 {
+			content = string(result[0][1])
 		}
 	}
-
-	log.Printf("%v", item)
-	return parse
+	return content
 }
