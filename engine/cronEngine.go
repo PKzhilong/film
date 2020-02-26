@@ -1,8 +1,11 @@
 package engine
 
+import "github.com/jinzhu/gorm"
+
 type CronEngine struct {
 	WorkerChannelCount int
 	Scheduler Scheduler
+	Db *gorm.DB
 }
 
 type Scheduler interface {
