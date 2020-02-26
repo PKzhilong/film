@@ -9,12 +9,23 @@ import (
 
 var detail = regexp.MustCompile(`<a href="([^"]+)" class="zoom" rel="bookmark" title="([^"]+)">[^<]*<img src="([^"]+)" alt="[^"]+" />[^<]*</a>`)
 
+var nextPage = regexp.MustCompile(`<a href="([^"]+)" class="next">下一页</a>`)
+
 func CategoryDetail(content []byte) engine.ParseResult  {
 	result := detail.FindAllSubmatch(content, -1)
 
 	var parse engine.ParseResult
 	var requests []engine.Request
 	var items []interface{}
+
+	nextPageRes := nextPage.FindAllSubmatch(content, 1)
+	if len(nextPageRes) > 0 {
+		request := engine.Request{
+			Url: string(nextPageRes[0][1]),
+			ParserFunc: CategoryDetail,
+		}
+		requests = append(requests, request)
+	}
 
 	for _, v := range result {
 		fileName := string(v[2])

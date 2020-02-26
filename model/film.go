@@ -17,4 +17,25 @@ type Film struct {
 
 	Plot string
 	Content string
+
+	DownloadUrls []DownloadUrl
+	HtmlOnlines []HtmlOnline
 }
+
+type DownloadUrl struct {
+	DownType string
+	Title string
+	Url string
+	Password string
+}
+
+type HtmlOnline struct {
+	PlayApp string
+	Items []DirItem
+}
+
+type DirItem struct {
+	Name string
+	Url string
+}
+
