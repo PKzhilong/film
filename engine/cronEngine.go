@@ -1,11 +1,9 @@
 package engine
 
-import "github.com/jinzhu/gorm"
-
 type CronEngine struct {
 	WorkerChannelCount int
 	Scheduler Scheduler
-	Db *gorm.DB
+	ItemChan chan interface{}
 }
 
 type Scheduler interface {
@@ -36,9 +34,11 @@ func (c *CronEngine) Run(seed ...Request)  {
 	for {
 		result := <- out
 		if len(result.Items) > 0 {
-			//for _, v := range result.Items {
-			//	log.Printf("获取内容： %v", )
-			//}
+			for _, v := range result.Items {
+				go func(item interface{}) {
+					c.ItemChan <- item
+				}(v)
+			}
 		}
 
 		for _, r := range result.Requests {

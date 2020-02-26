@@ -5,40 +5,38 @@ import (
 	"filmspider/engine"
 	"filmspider/model"
 	"github.com/PuerkitoBio/goquery"
-	"log"
-	"math/rand"
 	"regexp"
 )
 
 var coverDetail = regexp.MustCompile(`<p>[^<]*<img alt[=|"]* src="([^"]+)"[^>]*>`)
 
 //导演
-var dirtor = regexp.MustCompile(`导　　演[\s|:]*?([^<]+?)<br/>`)
-var dirtor2 = regexp.MustCompile(`导演[\s|:]*?([^<]+?)<br/>`)
+var dirtor = regexp.MustCompile(`导　　演([^<]+?)<br/>`)
+var dirtor2 = regexp.MustCompile(`导演[\s|:]+?([^<]+?)<br/>`)
 
 //编剧
-var writer = regexp.MustCompile(`编　　剧[\s|:]*?([^<]+?)<br/>`)
-var writer2 = regexp.MustCompile(`编剧[\s|:]*?([^<]+?)<br/>`)
+var writer = regexp.MustCompile(`编　　剧([^<]+?)<br/>`)
+var writer2 = regexp.MustCompile(`编剧[\s|:]+?([^<]+?)<br/>`)
 
 //主演
-var actor = regexp.MustCompile(`主　　演[\s|:]*?([^<]+?)<br/>`)
-var actor2 = regexp.MustCompile(`主演[\s|:]*?([^<]+?)<br/>`)
+var actor = regexp.MustCompile(`主　　演([^<]+?)<br/>`)
+var actor2 = regexp.MustCompile(`主演[\s|:]+?([^<]+?)<br/>`)
 //类型
-var filmType = regexp.MustCompile(`类　　别[\s|:]*?([^<]+?)<br/>`)
-var filmType2 = regexp.MustCompile(`类型[\s|:]*?([^<]+?)<br/>`)
+var filmType = regexp.MustCompile(`类　　别([^<]+?)<br/>`)
+var filmType2 = regexp.MustCompile(`类型[\s|:]+?([^<]+?)<br/>`)
 
 //地区
-var area = regexp.MustCompile(`国　　家[\s|:]*?([^<]+?)<br/>`)
-var area3 = regexp.MustCompile(`产　　地[\s|:]*?([^<]+?)<br/>`)
-var area2 = regexp.MustCompile(`地区[\s|:]*?([^<]+?)<br/>`)
+var area = regexp.MustCompile(`国　　家([^<]+?)<br/>`)
+var area3 = regexp.MustCompile(`产　　地([^<]+?)<br/>`)
+var area2 = regexp.MustCompile(`地区[\s|:]+?([^<]+?)<br/>`)
 
 //字幕
-var font = regexp.MustCompile(`字　　幕[\s|:]*?([^<]+?)<br/>`)
-var font2 = regexp.MustCompile(`字幕[\s|:]*?([^<]+?)<br/>`)
+var font = regexp.MustCompile(`字　　幕([^<]+?)<br/>`)
+var font2 = regexp.MustCompile(`字幕[\s|:]+?([^<]+?)<br/>`)
 
 //上映时间
-var onTime = regexp.MustCompile(`年　　代[\s|:]*?([^<]+?)<br/>`)
-var onTime2 = regexp.MustCompile(`上映日期[\s|:]*?([^<]+?)<br/>`)
+var onTime = regexp.MustCompile(`年　　代([^<]+?)<br/>`)
+var onTime2 = regexp.MustCompile(`上映日期[\s|:]+?([^<]+?)<br/>`)
 
 var downApp = regexp.MustCompile(`([^：]+).*`)
 var downPwd = regexp.MustCompile(`提取码：([\w]+)`)
@@ -57,7 +55,6 @@ func FilmDetailByDuc(content []byte, title string) engine.ParseResult {
 	doc, _ := goquery.NewDocumentFromReader(cont)
 
 	var parse engine.ParseResult
-	var requests []engine.Request
 
 	item := model.Film{
 		Name: title,
@@ -80,6 +77,7 @@ func FilmDetailByDuc(content []byte, title string) engine.ParseResult {
 	item.Language = getContent(conBytes, font2, font)
 	item.ShowTime = getContent(conBytes, onTime, onTime2)
 	item.Area = getContent(conBytes, area, area2)
+
 	item.TypeName = getContent(conBytes, filmType, filmType2)
 
 	doc.Find(downloadTable).Each(func(i int, selection *goquery.Selection) {
@@ -109,31 +107,16 @@ func FilmDetailByDuc(content []byte, title string) engine.ParseResult {
 	//获取在线观看详情页
 	doc.Find(htmlOnline).Each(func(i int, selection *goquery.Selection) {
 		var sh model.HtmlOnline
-		playApp := selection.Find("h3").Text()
-		sh.PlayApp = playApp
 
-		s := model.DirItem{}
 		url, err := selection.Find("a").Attr("href")
 		if err {
-			s.Url = url
+			sh.ParentUrl = url
 		}
 		name := selection.Find("a").Text()
-		s.Name = name
-
-		sh.Items = append(sh.Items, s)
-		log.Printf("%v\n", sh)
+		sh.Name = name
 		item.HtmlOnlines = append(item.HtmlOnlines, sh)
-
-		num := rand.Int()
-		request := engine.Request{
-			Url: s.Url,
-			ParserFunc: func(content []byte) engine.ParseResult {
-				return OnlineHtml(content, num)
-			},
-		}
-		requests = append(requests, request)
 	})
-	parse.Requests = requests
+	//parse.Requests = requests
 	parse.Items = append(parse.Items, item)
 	return parse
 }

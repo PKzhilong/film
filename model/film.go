@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -31,18 +32,18 @@ type Film struct {
 }
 
 type DownloadUrl struct {
+	gorm.Model
 	DownType string
+	FilmID uint
 	Title    string
 	Url      string
 	Password string
 }
 
 type HtmlOnline struct {
-	PlayApp string
-	Items   []DirItem
-}
-
-type DirItem struct {
+	gorm.Model
+	FilmID uint
+	ParentUrl string
 	Name string
-	Url  string
+	PlayUrl string
 }
