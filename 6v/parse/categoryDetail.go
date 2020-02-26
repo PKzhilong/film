@@ -11,7 +11,7 @@ var detail = regexp.MustCompile(`<a href="([^"]+)" class="zoom" rel="bookmark" t
 
 var nextPage = regexp.MustCompile(`<a href="([^"]+)" class="next">下一页</a>`)
 
-func CategoryDetail(content []byte) engine.ParseResult  {
+func CategoryDetail(content []byte, categoryID int) engine.ParseResult  {
 	result := detail.FindAllSubmatch(content, -1)
 
 	var parse engine.ParseResult
@@ -22,7 +22,9 @@ func CategoryDetail(content []byte) engine.ParseResult  {
 	if len(nextPageRes) > 0 {
 		request := engine.Request{
 			Url: string(nextPageRes[0][1]),
-			ParserFunc: CategoryDetail,
+			ParserFunc: func(bytes []byte) engine.ParseResult {
+				return CategoryDetail(bytes, categoryID)
+			},
 		}
 		requests = append(requests, request)
 	}
@@ -31,12 +33,8 @@ func CategoryDetail(content []byte) engine.ParseResult  {
 		fileName := string(v[2])
 		request := engine.Request{
 			Url:        string(v[1]),
-			//ParserFunc: FilmDetail,
-			//ParserFunc: func(c []byte) engine.ParseResult {
-			//	return FilmDetail(c, string(v[1]))
-			//},
 			ParserFunc: func(bytes []byte) engine.ParseResult {
-				return FilmDetailByDuc(bytes, fileName)
+				return FilmDetailByDuc(bytes, fileName, categoryID)
 			},
 		}
 		item := engine.Item{

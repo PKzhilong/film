@@ -3,9 +3,10 @@ package persist
 import (
 	"filmspider/engine"
 	"filmspider/model"
+	"github.com/go-redis/redis/v7"
 )
 
-func ItemServer() chan interface{} {
+func ItemServer(redis *redis.Client) chan interface{} {
 	db := engine.DBRun()
 	out := make(chan interface{})
 

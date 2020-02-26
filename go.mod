@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/gin-gonic/gin v1.5.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-redis/redis/v7 v7.2.0
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/joho/godotenv v1.3.0 // indirect
@@ -20,6 +21,7 @@ require (
 	golang.org/x/net v0.0.0-20200219183655-46282727080f
 	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
 	golang.org/x/text v0.3.2
+	golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

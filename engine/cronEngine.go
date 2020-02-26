@@ -1,9 +1,12 @@
 package engine
 
+import "github.com/go-redis/redis/v7"
+
 type CronEngine struct {
 	WorkerChannelCount int
 	Scheduler Scheduler
 	ItemChan chan interface{}
+	Redis *redis.Client
 }
 
 type Scheduler interface {

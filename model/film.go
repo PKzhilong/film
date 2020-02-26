@@ -10,6 +10,7 @@ type Film struct {
 	Name     string
 	Cover    string
 	Type     int
+	CategoryID int
 	Language string
 	ShowTime string
 	Length   int

@@ -49,7 +49,7 @@ var downloadTable = "table>tbody tr"
 //在线观看地址
 var htmlOnline = ".context>.widget.box.row"
 
-func FilmDetailByDuc(content []byte, title string) engine.ParseResult {
+func FilmDetailByDuc(content []byte, title string, categoryID int) engine.ParseResult {
 
 	cont := bytes.NewReader(content)
 	doc, _ := goquery.NewDocumentFromReader(cont)
@@ -58,7 +58,7 @@ func FilmDetailByDuc(content []byte, title string) engine.ParseResult {
 
 	item := model.Film{
 		Name: title,
-		Type: 3,
+		CategoryID: categoryID,
 	}
 
 	doc.Find(coverImg).Each(func(i int, selection *goquery.Selection) {
