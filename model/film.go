@@ -42,7 +42,7 @@ type DownloadUrl struct {
 }
 
 type HtmlOnline struct {
-	gorm.Model
+	ID   int `gorm:"primary_key"`
 	FilmID uint
 	ParentUrl string
 	Name string

@@ -1,6 +1,8 @@
 package engine
 
-import "github.com/go-redis/redis/v7"
+import (
+	"github.com/go-redis/redis/v7"
+)
 
 type CronEngine struct {
 	WorkerChannelCount int
@@ -23,7 +25,7 @@ type NotifyWorkChannel interface {
 func (c *CronEngine) Run(seed ...Request)  {
 
 	out := make(chan ParseResult)
-	c.Scheduler.Run()
+	//c.Scheduler.Run()
 
 	for i := 0; i < c.WorkerChannelCount; i++ {
 		createWorker(c.Scheduler.WorkerChannel(), out, c.Scheduler)
@@ -43,7 +45,6 @@ func (c *CronEngine) Run(seed ...Request)  {
 				}(v)
 			}
 		}
-
 		for _, r := range result.Requests {
 			c.Scheduler.Submit(r)
 		}
