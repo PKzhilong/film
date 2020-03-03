@@ -7,7 +7,6 @@ import (
 	"filmspider/persist"
 	"filmspider/repository"
 	"filmspider/schedules"
-	"fmt"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
 	"path"
@@ -38,18 +37,19 @@ func main()  {
 	}
 
 	//...todo 简单调度器的时候
-	go RunOn(sc.WorkerChannel())
+	//go RunOn(sc.WorkerChannel())
 
 	eg.Run(engine.Request{
 		//Url: "https://www.i6v.cc",
 		//Url: "https://www.i6v.cc/xijupian/866.html",
-		//Url: "https://www.i6v.cc/zhanzhengpian/12849.html",
+		Url: "https://www.i6v.cc/zhanzhengpian/12849.html",
 
-		//Url:  "https://www.i6v.cc/zhanzhengpian/12849.html",
+		//Url:  "https://www.i6v.cc/donghuapian/10265.html",
+		//Url:  "https://www.i6v.cc/dongzuopian/12791.html",
 		//Url: "https://www.i6v.cc/donghuapian/index.html",
-		//ParserFunc: func(bytes []byte) engine.ParseResult {
-		//	return parse.FilmDetailByDuc(bytes, "2323", 2)
-		//},
+		ParserFunc: func(bytes []byte) engine.ParseResult {
+			return parse.FilmDetailByDuc(bytes, "2323", 2)
+		},
 		//ParserFunc: parse.CategoryDetail,
 		//ParserFunc: parse.CategoryParse,
 	})
@@ -62,7 +62,7 @@ func RunOn(in chan engine.Request)  {
 
 	count := 0
 	db.Model(&model.HtmlOnline{}).Where("play_url = ''").Count(&count)
-	limit := 100
+	limit := 10
 	offset := 0
 
 	for offset <= count {
@@ -73,9 +73,9 @@ func RunOn(in chan engine.Request)  {
 			//...todo 如果更新
 			basename := path.Base(v.ParentUrl)
 			ext := path.Ext(basename)
-			v.PlayUrl = v.ParentUrl
-			fmt.Printf("获取到的地址：%s 扩展名: %s\n", basename, ext)
+			//fmt.Printf("获取到的地址：%s 扩展名: %s\n", basename, ext)
 			if ext == ".mp4" {
+				v.PlayUrl = v.ParentUrl
 				repository.HtmlOnline{DB: db}.Update(&v)
 				continue
 			}

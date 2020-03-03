@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"filmspider/engine"
 	"filmspider/model"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"regexp"
 )
@@ -41,6 +42,8 @@ var onTime2 = regexp.MustCompile(`上映日期[\s|:]+?([^<]+?)<br/>`)
 var downApp = regexp.MustCompile(`([^：]+).*`)
 var downPwd = regexp.MustCompile(`提取码：([\w]+)`)
 
+var plot = regexp.MustCompile(`◎简　　介(.*)</p>`)
+
 //下载地址
 
 var coverImg = "#post_content>p>img"
@@ -50,7 +53,6 @@ var downloadTable = "table>tbody tr"
 var htmlOnline = ".context>.widget.box.row"
 
 func FilmDetailByDuc(content []byte, title string, categoryID int) engine.ParseResult {
-
 	cont := bytes.NewReader(content)
 	doc, _ := goquery.NewDocumentFromReader(cont)
 
@@ -80,6 +82,9 @@ func FilmDetailByDuc(content []byte, title string, categoryID int) engine.ParseR
 
 	item.TypeName = getContent(conBytes, filmType, filmType2)
 
+	pl := getContent(conBytes, plot)
+	item.Plot = pl
+
 	doc.Find(downloadTable).Each(func(i int, selection *goquery.Selection) {
 		c := selection.Find("a").Text()
 		u := model.DownloadUrl{Title: c}
@@ -106,15 +111,19 @@ func FilmDetailByDuc(content []byte, title string, categoryID int) engine.ParseR
 
 	//获取在线观看详情页
 	doc.Find(htmlOnline).Each(func(i int, selection *goquery.Selection) {
-		var sh model.HtmlOnline
+		selection.Find("a").Each(func(count int, s *goquery.Selection) {
+			var sh model.HtmlOnline
+			url, err := s.Attr("href")
+			if err {
+				sh.ParentUrl = url
+			}
+			name := s.Text()
+			sh.Name = name
 
-		url, err := selection.Find("a").Attr("href")
-		if err {
-			sh.ParentUrl = url
-		}
-		name := selection.Find("a").Text()
-		sh.Name = name
-		item.HtmlOnlines = append(item.HtmlOnlines, sh)
+			fmt.Printf("%s", url)
+			item.HtmlOnlines = append(item.HtmlOnlines, sh)
+		})
+
 	})
 	//parse.Requests = requests
 	parse.Items = append(parse.Items, item)
