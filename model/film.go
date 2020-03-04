@@ -6,7 +6,7 @@ import (
 )
 
 type Film struct {
-	ID       uint `gorm:"primary_key"`
+	ID       int `gorm:"primary_key"`
 	Name     string
 	Cover    string
 	Type     int
@@ -35,7 +35,7 @@ type Film struct {
 type DownloadUrl struct {
 	gorm.Model
 	DownType string
-	FilmID uint
+	FilmID   int
 	Title    string
 	Url      string
 	Password string
@@ -43,7 +43,7 @@ type DownloadUrl struct {
 
 type HtmlOnline struct {
 	ID   int `gorm:"primary_key"`
-	FilmID uint
+	FilmID int
 	ParentUrl string
 	Name string
 	PlayUrl string

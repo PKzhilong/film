@@ -16,3 +16,7 @@ func (f HtmlOnline) Create(h *model.HtmlOnline) {
 func (f HtmlOnline) Update(h *model.HtmlOnline)  {
 	f.DB.Model(model.HtmlOnline{}).Where("id = ?", h.ID).Update(h)
 }
+
+func (f HtmlOnline) UpdateByID(id int, h *model.HtmlOnline)  {
+	f.DB.Debug().Model(model.HtmlOnline{}).Where("id = ?", id).Update(h)
+}

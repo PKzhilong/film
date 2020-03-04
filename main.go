@@ -3,6 +3,7 @@ package main
 import (
 	"filmspider/6v/parse"
 	"filmspider/engine"
+	"filmspider/gadfilm/run"
 	"filmspider/model"
 	"filmspider/persist"
 	"filmspider/repository"
@@ -34,26 +35,18 @@ func main()  {
 		WorkerChannelCount: 5,
 		ItemChan: itemChan,
 		Redis: redisClient,
+		DB: db,
 	}
 
 	//...todo 简单调度器的时候
 	//go RunOn(sc.WorkerChannel())
 
-	eg.Run(engine.Request{
-		//Url: "https://www.i6v.cc",
-		//Url: "https://www.i6v.cc/xijupian/866.html",
-		Url: "https://www.i6v.cc/zhanzhengpian/12849.html",
+	//...todo 爬6v
+	//run.Run(&eg)
 
-		//Url:  "https://www.i6v.cc/donghuapian/10265.html",
-		//Url:  "https://www.i6v.cc/dongzuopian/12791.html",
-		//Url: "https://www.i6v.cc/donghuapian/index.html",
-		ParserFunc: func(bytes []byte) engine.ParseResult {
-			return parse.FilmDetailByDuc(bytes, "2323", 2)
-		},
-		//ParserFunc: parse.CategoryDetail,
-		//ParserFunc: parse.CategoryParse,
-	})
 
+	//...todo 天堂
+	run.Run(&eg)
 }
 
 // 在线地址存储

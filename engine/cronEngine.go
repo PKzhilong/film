@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/go-redis/redis/v7"
+	"github.com/jinzhu/gorm"
 )
 
 type CronEngine struct {
@@ -9,6 +10,7 @@ type CronEngine struct {
 	Scheduler Scheduler
 	ItemChan chan interface{}
 	Redis *redis.Client
+	DB *gorm.DB
 }
 
 type Scheduler interface {
