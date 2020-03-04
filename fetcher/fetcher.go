@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var timer = time.NewTicker(500 * time.Microsecond)
+var timer = time.NewTicker(300 * time.Microsecond)
 
 
 func Fetch(url string) ([]byte, error) {

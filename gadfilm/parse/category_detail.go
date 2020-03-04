@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jinzhu/gorm"
-	"path"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -67,12 +67,11 @@ func CategoryDetail(c []byte, d *gorm.DB, categoryID int, parentUrl string) engi
 	//...todou 获取下一页
 	content.Find(".pages a").Each(func(i int, selection *goquery.Selection) {
 		text := selection.Text()
-		dir := path.Dir(parentUrl)
 		if text != "下一页" {
 			return
 		}
-		url, _ := selection.Attr("href")
-		ru := dir + "/" + url
+		u, _ := selection.Attr("href")
+		ru := getNextUrl(parentUrl, u)
 		request := engine.Request{
 			Url: ru,
 			ParserFunc: func(i []byte) engine.ParseResult {
@@ -116,4 +115,22 @@ func getUrlID(url string) int {
 		return 0
 	}
 	return id
+}
+
+func getNextUrl(baseUrl string, newUrl string) string  {
+	u, _ := url.Parse(baseUrl)
+	p := u.Path
+
+	pl := strings.Split(p,"/")
+	pu := "/"
+	for i, v := range pl {
+		if len(pl) == (i+1) {
+			pu += "/"
+			continue
+		}
+		pu += v
+	}
+
+	resultUrl := host + pu + newUrl
+	return resultUrl
 }

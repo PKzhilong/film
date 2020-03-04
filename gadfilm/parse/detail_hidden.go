@@ -28,8 +28,6 @@ func DetailHidden(c []byte, d *gorm.DB, filmID int) engine.ParseResult  {
 	cont.Find(".p_list").Each(func(i int, selection *goquery.Selection) {
 		title := selection.Find("h2").Text()
 		if title == "云播放" {
-			html, _ := selection.Html()
-			fmt.Print(html)
 			selection.Find("ul li").Each(func(index int, s *goquery.Selection) {
 				a := s.Find("a")
 

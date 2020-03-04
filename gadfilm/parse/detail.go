@@ -23,7 +23,6 @@ func Detail(c []byte, d *gorm.DB, filmID int, urlID int) engine.ParseResult  {
 		fmt.Printf("%v", err)
 		return parse
 	}
-	//fmt.Printf("%s", c)
 
 	film := model.Film{
 		ID: filmID,
@@ -32,7 +31,6 @@ func Detail(c []byte, d *gorm.DB, filmID int, urlID int) engine.ParseResult  {
 	cont.Find(".vod .vod_intro.rt").Each(func(i int, selection *goquery.Selection) {
 
 		selection.Find("dl dt").Each(func(index int, s *goquery.Selection) {
-			//fmt.Printf("%s\n", s.Text())
 
 			if s.Text() == "语言:" {
 				dd := s.Next()

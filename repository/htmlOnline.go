@@ -18,5 +18,5 @@ func (f HtmlOnline) Update(h *model.HtmlOnline)  {
 }
 
 func (f HtmlOnline) UpdateByID(id int, h *model.HtmlOnline)  {
-	f.DB.Debug().Model(model.HtmlOnline{}).Where("id = ?", id).Update(h)
+	f.DB.Model(model.HtmlOnline{}).Where("id = ?", id).Update(h)
 }
