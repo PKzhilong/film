@@ -10,7 +10,9 @@ import (
 	"filmspider/schedules"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
+	"os"
 	"path"
+	"strconv"
 )
 
 func main()  {
@@ -30,9 +32,10 @@ func main()  {
 	sc := &schedules.QueueSchedule{}
 	sc.Run()
 
+	wc, _ := strconv.Atoi(os.Getenv("WORKERCOUNT"))
 	eg := engine.CronEngine{
 		Scheduler: sc,
-		WorkerChannelCount: 5,
+		WorkerChannelCount: wc,
 		ItemChan: itemChan,
 		Redis: redisClient,
 		DB: db,
