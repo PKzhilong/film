@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"container/list"
 	"filmspider/model"
 	"github.com/jinzhu/gorm"
 )
@@ -24,6 +23,6 @@ func (c *ContentTypes) CreateIfExist(name string) int {
 	return newT.ID
 }
 
-func (c *ContentTypes) GetAll() (list.Element) {
-
+func (c *ContentTypes) GetAll() (list []model.ContentType) {
+	return list
 }
