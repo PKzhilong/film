@@ -9,7 +9,7 @@ require (
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/jinzhu/gorm v1.9.12
-	github.com/joho/godotenv v1.3.0 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
