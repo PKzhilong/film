@@ -1,7 +1,7 @@
 package run
 
 import (
-	"filmspider/6v/parse"
+	"filmspider/film_origin/6v/parse"
 	"filmspider/engine"
 )
 

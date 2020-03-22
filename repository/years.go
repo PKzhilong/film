@@ -9,9 +9,9 @@ type Years struct {
 	DB *gorm.DB
 }
 
-func (c *Years) CreateIfNotExist(year int) bool {
+func (y *Years) CreateIfNotExist(year int) bool {
 	var count int
-	c.DB.Model(model.Year{}).Where("year = ?", year).Count(&count)
+	y.DB.Model(model.Year{}).Where("year = ?", year).Count(&count)
 	if count > 0 || year == 0 {
 		return false
 	}
@@ -19,6 +19,11 @@ func (c *Years) CreateIfNotExist(year int) bool {
 	newT := &model.Year{
 		Year: year,
 	}
-	c.DB.Create(newT)
+	y.DB.Create(newT)
 	return true
+}
+
+func (y *Years) GetALL() (list []model.Year)  {
+	y.DB.Find(&list)
+	return
 }

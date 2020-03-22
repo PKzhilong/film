@@ -23,3 +23,8 @@ func (c *Areas) CreateIfNotExist(name string) bool {
 	c.DB.Create(newT)
 	return true
 }
+
+func (c *Areas) GetAll() (list []model.Area) {
+	c.DB.Find(&list)
+	return
+}

@@ -22,3 +22,8 @@ func (c *Languages) CreateIfNotExist(name string) bool {
 	c.DB.Create(newT)
 	return true
 }
+
+func (c *Languages) GetAll() (list []model.Language) {
+	c.DB.Find(&list)
+	return
+}

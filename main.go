@@ -1,17 +1,15 @@
 package main
 
 import (
-	"filmspider/6v/parse"
 	"filmspider/engine"
-	"filmspider/gadfilm/run"
-	"filmspider/model"
+	"filmspider/film_origin/ok_resource/run"
 	"filmspider/persist"
 	"filmspider/repository"
 	"filmspider/schedules"
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
 	"os"
-	"path"
 	"strconv"
 )
 
@@ -40,6 +38,7 @@ func main()  {
 		Redis: redisClient,
 		DB: db,
 	}
+	eg.Categories = initCategories(db)
 
 	//...todo 简单调度器的时候
 	//go RunOn(sc.WorkerChannel())
@@ -49,42 +48,24 @@ func main()  {
 
 
 	//...todo 天堂
+	//run2.Run(&eg)
+
+	//...todo ok网
 	run.Run(&eg)
 }
 
-// 在线地址存储
-func RunOn(in chan engine.Request)  {
-	db := engine.DBRun()
+func initCategories(db *gorm.DB) *engine.Categories {
+	var c engine.Categories
+	c.CateList = repository.Category{DB: db}.GetAll()
+	lan := &repository.Languages{DB: db}
+	c.Languages = lan.GetAll()
+	ar := &repository.Areas{DB: db}
+	c.Areas = ar.GetAll()
 
-	count := 0
-	db.Model(&model.HtmlOnline{}).Where("play_url = ''").Count(&count)
-	limit := 10
-	offset := 0
+	ye := &repository.Years{DB: db}
+	c.Years = ye.GetALL()
 
-	for offset <= count {
-		var list []model.HtmlOnline
-		db.Where("play_url = ''").Offset(offset).Limit(limit).Find(&list)
-		offset = offset + limit
-		for _, v := range list {
-			//...todo 如果更新
-			basename := path.Base(v.ParentUrl)
-			ext := path.Ext(basename)
-			//fmt.Printf("获取到的地址：%s 扩展名: %s\n", basename, ext)
-			if ext == ".mp4" {
-				v.PlayUrl = v.ParentUrl
-				repository.HtmlOnline{DB: db}.Update(&v)
-				continue
-			}
-
-
-			ID := v.ID
-			request := engine.Request{
-				Url: v.ParentUrl,
-				ParserFunc: func(bytes []byte) engine.ParseResult {
-					return parse.OnlineHtml(bytes, ID)
-				},
-			}
-			in <- request
-		}
-	}
+	ct := &repository.ContentTypes{DB: db}
+	c.ContentTypes = ct.GetAll()
+	return &c
 }
