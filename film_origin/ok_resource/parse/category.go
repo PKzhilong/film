@@ -11,7 +11,7 @@ import (
 
 var host = "http://www.okzyw.com"
 
-func Category(content []byte, d *gorm.DB) engine.ParseResult {
+func Category(content []byte, d *gorm.DB, categories *engine.Categories) engine.ParseResult {
 
 	bodyReader := bytes.NewReader(content)
 	cont, err := goquery.NewDocumentFromReader(bodyReader)
@@ -29,12 +29,23 @@ func Category(content []byte, d *gorm.DB) engine.ParseResult {
 				name := se.Text()
 				name = strings.Replace(name, "片", "", -1)
 				src, _ := se.Attr("href")
+				if name == "福利" || name == "解说" {
+					return
+				}
 
 				url := host + src
+				//获取内容分类
+				contentID := 0
+				for _, v := range categories.ContentTypes {
+					if v.Name == name {
+						contentID = v.ID
+					}
+				}
+
 				request := engine.Request{
 					Url: url,
 					ParserFunc: func(bytes []byte) engine.ParseResult {
-						return engine.NilParaser(bytes)
+						return CategoryDetail(bytes, d, contentID, categories)
 					},
 				}
 				parse.Requests = append(parse.Requests, request)

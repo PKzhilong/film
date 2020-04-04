@@ -24,5 +24,6 @@ func (c *ContentTypes) CreateIfExist(name string) int {
 }
 
 func (c *ContentTypes) GetAll() (list []model.ContentType) {
+	c.DB.Find(&list)
 	return list
 }

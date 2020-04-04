@@ -35,6 +35,7 @@ func (c Category) CreateIfNotExist(name string) bool {
 	c.DB.Create(content)
 	return true
 }
+
 func (c Category) GetAll() []model.Category {
 	var list []model.Category
 	c.DB.Find(&list)
